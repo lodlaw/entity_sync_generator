@@ -26,12 +26,15 @@ class UseSerializationGenerator
     sourceBuilder.writeln(
         " class \$_${element.displayName} extends ${baseElement.displayName} with SerializableMixin { ");
 
+    // override annotation for toMap()
+    sourceBuilder.writeln("@override");
+
     // open toMap method
     sourceBuilder.writeln("Map toMap() { return {");
 
     // properties of map
     for (final propertyName in visitor.fields.keys) {
-      sourceBuilder.writeln("\"$propertyName\": this.$propertyName,");
+      sourceBuilder.writeln("'$propertyName': $propertyName,");
     }
 
     // close toMap method
