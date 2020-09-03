@@ -12,6 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  entity_sync:
+    path: ../entity_sync
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
