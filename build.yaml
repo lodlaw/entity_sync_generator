@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      entity_sync_generator|entity_sync_builder:
+        enabled: true
+
+builders:
+  entity_sync_builder:
+      target: ":entity_sync_generator"
+      import: "package:entity_sync_generator/entity_sync_generator.dart"
+      builder_factories: ["entitySyncBuilder"]
+      build_extensions: {".dart":[".g.part"]}
+      auto_apply: dependents
+      build_to: cache
+      applies_builders: ["source_gen|combining_builder"]
