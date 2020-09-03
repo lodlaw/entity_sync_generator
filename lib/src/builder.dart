@@ -3,14 +3,16 @@ import 'package:build/build.dart';
 import 'package:entity_sync/entity_sync.dart';
 import 'package:source_gen/source_gen.dart';
 
-Builder entitySyncBuilder(BuilderOptions options) {
-  return SharedPartBuilder([EntitySyncGenerator()], 'entity_sync_builder');
+Builder useSerializationBuilder(BuilderOptions options) {
+  return SharedPartBuilder(
+      [UseSerializationGenerator()], 'use_serialization_builder');
 }
 
-class EntitySyncGenerator extends GeneratorForAnnotation<UseSerialization> {
+class UseSerializationGenerator
+    extends GeneratorForAnnotation<UseSerialization> {
   @override
   generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) {
-    return '// haha this has worked perfectly';
+    return '// haha this has worked perfectly123';
   }
 }

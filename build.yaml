@@ -1,14 +1,14 @@
 targets:
   $default:
     builders:
-      entity_sync_generator|entity_sync_builder:
+      entity_sync_generator|use_serialization_builder:
         enabled: true
 
 builders:
-  entity_sync_builder:
+  use_serialization_builder:
       target: ":entity_sync_generator"
       import: "package:entity_sync_generator/entity_sync_generator.dart"
-      builder_factories: ["entitySyncBuilder"]
+      builder_factories: ["useSerializationBuilder"]
       build_extensions: {".dart":[".g.part"]}
       auto_apply: dependents
       build_to: cache

@@ -3,7 +3,7 @@
 part of 'spaceship_proxy.dart';
 
 // **************************************************************************
-// EntitySyncGenerator
+// UseSerializationGenerator
 // **************************************************************************
 
-// haha this has worked perfectly
+// haha this has worked perfectly123
