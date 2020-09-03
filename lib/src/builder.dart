@@ -26,6 +26,44 @@ class UseSerializationGenerator
     sourceBuilder.writeln(
         " class \$_${element.displayName} extends ${baseElement.displayName} with SerializableMixin { ");
 
+    // add constructor if it does exist
+    if (visitor.parameters.isNotEmpty) {
+      final requiredPositionalArguments =
+          visitor.parameters.where((element) => element.isRequiredPositional);
+      final namedArguments =
+          visitor.parameters.where((element) => element.isNamed);
+
+      sourceBuilder.write("\$_${element.displayName}(");
+
+      for (final parameter in requiredPositionalArguments) {
+        sourceBuilder.write("$parameter,");
+      }
+
+      if (namedArguments.isNotEmpty) {
+        sourceBuilder.write("{");
+
+        namedArguments.forEach((element) {
+          sourceBuilder.write("${element.type} ${element.name}, ");
+        });
+
+        sourceBuilder.write("}");
+      }
+
+      sourceBuilder.write(") : super(");
+
+      for (final parameter in requiredPositionalArguments) {
+        sourceBuilder.write("${parameter.name},");
+      }
+
+      if (namedArguments.isNotEmpty) {
+        namedArguments.forEach((element) {
+          sourceBuilder.write("${element.name}: ${element.name},");
+        });
+      }
+
+      sourceBuilder.writeln(");");
+    }
+
     // override annotation for toMap()
     sourceBuilder.writeln("@override");
 
@@ -50,10 +88,13 @@ class UseSerializationGenerator
 class ModelVisitor extends SimpleElementVisitor {
   DartType className;
   Map<String, DartType> fields = Map();
+  List<ParameterElement> parameters = [];
 
   @override
   visitConstructorElement(ConstructorElement element) {
     className = element.type.returnType;
+    parameters = element.parameters;
+
     return super.visitConstructorElement(element);
   }
 

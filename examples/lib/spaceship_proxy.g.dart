@@ -7,11 +7,21 @@ part of 'spaceship_proxy.dart';
 // **************************************************************************
 
 class $_SpaceshipProxy extends Spaceship with SerializableMixin {
+  $_SpaceshipProxy({
+    int id,
+    String name,
+    String location,
+  }) : super(
+          id: id,
+          name: name,
+          location: location,
+        );
+  @override
   Map toMap() {
     return {
-      "id": this.id,
-      "name": this.name,
-      "location": this.location,
+      'id': id,
+      'name': name,
+      'location': location,
     };
   }
 }
