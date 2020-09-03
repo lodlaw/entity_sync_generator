@@ -6,4 +6,12 @@ part of 'spaceship_proxy.dart';
 // UseSerializationGenerator
 // **************************************************************************
 
-// haha this has worked perfectly123
+class $_SpaceshipProxy extends Spaceship with SerializableMixin {
+  Map toMap() {
+    return {
+      "id": this.id,
+      "name": this.name,
+      "location": this.location,
+    };
+  }
+}
