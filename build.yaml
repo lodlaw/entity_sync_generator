@@ -3,12 +3,23 @@ targets:
     builders:
       entity_sync_generator|use_serialization_builder:
         enabled: true
+      entity_sync_generator|is_serializer_builder:
+        enabled: true
 
 builders:
   use_serialization_builder:
       target: ":entity_sync_generator"
       import: "package:entity_sync_generator/entity_sync_generator.dart"
       builder_factories: ["useSerializationBuilder"]
+      build_extensions: {".dart":[".g.part"]}
+      auto_apply: dependents
+      build_to: cache
+      applies_builders: ["source_gen|combining_builder"]
+
+  is_serializer_builder:
+      target: ":entity_sync_generator"
+      import: "package:entity_sync_generator/entity_sync_generator.dart"
+      builder_factories: ["isSerializerBuilder"]
       build_extensions: {".dart":[".g.part"]}
       auto_apply: dependents
       build_to: cache

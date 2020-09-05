@@ -3,6 +3,21 @@
 part of 'spaceship_proxy.dart';
 
 // **************************************************************************
+// IsSerializerGenerator
+// **************************************************************************
+
+abstract class $_SpaceshipSerializer extends Serializer<SpaceshipProxy> {
+  int validateId(int value);
+  String validateName(String value);
+  Map toMap() {
+    return {
+      'validateId': validateId,
+      'validateName': validateName,
+    };
+  }
+}
+
+// **************************************************************************
 // UseSerializationGenerator
 // **************************************************************************
 
