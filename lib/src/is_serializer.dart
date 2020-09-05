@@ -16,6 +16,12 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
     sourceBuilder.writeln(
         "abstract class \$_${element.displayName} extends Serializer<$proxyClass> {");
 
+    // write construtor
+    sourceBuilder.writeln("""
+    \$_${element.displayName}({Map<String, dynamic> data, $proxyClass instance}): 
+                          super(data: data, instance: instance);
+    """);
+
     final methods = <String>[];
     // write validation methods
     annotation.read('fields').listValue.forEach((element) {

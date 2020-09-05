@@ -7,6 +7,9 @@ part of 'spaceship_proxy.dart';
 // **************************************************************************
 
 abstract class $_SpaceshipSerializer extends Serializer<SpaceshipProxy> {
+  $_SpaceshipSerializer({Map<String, dynamic> data, SpaceshipProxy instance})
+      : super(data: data, instance: instance);
+
   int validateId(int value);
   String validateName(String value);
   Map toMap() {
