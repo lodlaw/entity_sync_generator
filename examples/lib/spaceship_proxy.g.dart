@@ -10,8 +10,13 @@ abstract class $_SpaceshipSerializer extends Serializer<SpaceshipProxy> {
   $_SpaceshipSerializer({Map<String, dynamic> data, SpaceshipProxy instance})
       : super(data: data, instance: instance);
 
+  final fields = [
+    IntegerField('id'),
+    StringField('name'),
+  ];
   int validateId(int value);
   String validateName(String value);
+  @override
   Map toMap() {
     return {
       'validateId': validateId,

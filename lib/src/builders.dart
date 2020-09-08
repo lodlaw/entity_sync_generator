@@ -11,12 +11,15 @@ part 'use_serialization.dart';
 class ModelVisitor extends SimpleElementVisitor {
   DartType className;
   Map<String, DartType> fields = Map();
-  List<ParameterElement> parameters = [];
+  List<ParameterElement> parameters;
 
   @override
   visitConstructorElement(ConstructorElement element) {
     className = element.type.returnType;
-    parameters = element.parameters;
+
+    if (parameters == null) {
+      parameters = element.parameters;
+    }
 
     return super.visitConstructorElement(element);
   }

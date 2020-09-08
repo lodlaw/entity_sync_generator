@@ -22,6 +22,17 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
                           super(data: data, instance: instance);
     """);
 
+    // write fields
+    sourceBuilder.writeln("@override");
+    sourceBuilder.write("final fields = [");
+    annotation.read('fields').listValue.forEach((element) {
+      final name = ConstantReader(element).read('name').stringValue;
+      final type = element.type.element.displayName;
+
+      sourceBuilder.write("$type('$name'),");
+    });
+    sourceBuilder.writeln("];");
+
     final methods = <String>[];
     // write validation methods
     annotation.read('fields').listValue.forEach((element) {
@@ -39,11 +50,14 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
         case "DateTimeField":
           returnType = "DateTime";
           break;
-        case "BooleanField":
+        case "BoolField":
           returnType = "bool";
           break;
+        case "DateField":
+          returnType = "DateTime";
+          break;
       }
-
+      
       final methodName = "validate$name";
       methods.add(methodName);
 
@@ -51,6 +65,7 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
     });
 
     // write toMap method
+    sourceBuilder.writeln("@override");
     sourceBuilder.write("Map toMap() {");
     sourceBuilder.write("return {");
     methods.forEach((element) {
