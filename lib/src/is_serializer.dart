@@ -27,9 +27,15 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
     sourceBuilder.write("final fields = [");
     annotation.read('fields').listValue.forEach((element) {
       final name = ConstantReader(element).read('name').stringValue;
+
+      final constantReaderPrefix = ConstantReader(element).read('prefix');
+      String prefix =
+          constantReaderPrefix.isNull ? "" : constantReaderPrefix.stringValue;
+
       final type = element.type.element.displayName;
 
-      sourceBuilder.write("$type('$name'),");
+      sourceBuilder.write(
+          "$type('$name' ${prefix.isEmpty ? "" : ",prefix: '$prefix'"}),");
     });
     sourceBuilder.writeln("];");
 
@@ -57,11 +63,13 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
           returnType = "DateTime";
           break;
       }
-      
+
       final methodName = "validate$name";
       methods.add(methodName);
 
-      sourceBuilder.writeln('$returnType $methodName($returnType value);');
+      sourceBuilder.writeln("""$returnType $methodName($returnType value) {
+            return value;
+          }""");
     });
 
     // write toMap method
@@ -73,6 +81,10 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
     });
     sourceBuilder.write("};");
     sourceBuilder.write("}");
+
+    // write prefix
+    sourceBuilder.writeln("@override");
+    sourceBuilder.writeln("String get prefix => '';");
 
     // close class name
     sourceBuilder.writeln("}");
