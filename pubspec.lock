@@ -102,9 +102,11 @@ packages:
   entity_sync:
     dependency: "direct main"
     description:
-      path: "../entity_sync"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: cf2b15584a8e2d9349078c7878f621887417eadd
+      url: "https://github.com/anhphamduy/entity_sync"
+    source: git
     version: "0.0.1"
   ffi:
     dependency: transitive

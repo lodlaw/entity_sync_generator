@@ -21,13 +21,13 @@ class UseSerializationGenerator
     sourceBuilder.writeln(
         " class \$_${element.displayName} extends ${baseElement.displayName} with SerializableMixin { ");
 
+    final requiredPositionalArguments =
+        visitor.parameters.where((element) => element.isRequiredPositional);
+    final namedArguments =
+        visitor.parameters.where((element) => element.isNamed);
+
     // add constructor if it does exist
     if (visitor.parameters.isNotEmpty) {
-      final requiredPositionalArguments =
-          visitor.parameters.where((element) => element.isRequiredPositional);
-      final namedArguments =
-          visitor.parameters.where((element) => element.isNamed);
-
       sourceBuilder.write("\$_${element.displayName}(");
 
       for (final parameter in requiredPositionalArguments) {
@@ -63,7 +63,7 @@ class UseSerializationGenerator
     sourceBuilder.writeln("@override");
 
     // open toMap method
-    sourceBuilder.writeln("Map toMap() { return {");
+    sourceBuilder.writeln("Map<String, dynamic> toMap() { return {");
 
     // properties of map
     for (final propertyName in visitor.fields.keys) {
@@ -72,6 +72,24 @@ class UseSerializationGenerator
 
     // close toMap method
     sourceBuilder.writeln("};}");
+
+    // override annotation for copyFromMap()
+    sourceBuilder.writeln("@override");
+
+    // open copyFromMap method
+    sourceBuilder.writeln(
+        "\$_${element.displayName} copyFromMap(Map<String, dynamic> data) {");
+
+    sourceBuilder.writeln("return \$_${element.displayName}(");
+
+    namedArguments.forEach((element) {
+      sourceBuilder.write("${element.name}: data['${element.name}'],");
+    });
+
+    sourceBuilder.writeln(");");
+
+    // close method
+    sourceBuilder.writeln("}");
 
     // close class name
     sourceBuilder.writeln("}");

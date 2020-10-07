@@ -32,10 +32,15 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
       String prefix =
           constantReaderPrefix.isNull ? "" : constantReaderPrefix.stringValue;
 
+      final constantReaderSource = ConstantReader(element).read('source');
+      String source =
+          constantReaderSource.isNull ? name : constantReaderSource.stringValue;
+
       final type = element.type.element.displayName;
 
       sourceBuilder.write(
-          "$type('$name' ${prefix.isEmpty ? "" : ",prefix: '$prefix'"}),");
+        "$type('$name' ${prefix.isEmpty ? "" : ",prefix: '$prefix'"}, source: '$source'),",
+      );
     });
     sourceBuilder.writeln("];");
 
@@ -62,6 +67,9 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
         case "DateField":
           returnType = "DateTime";
           break;
+        case "DoubleField":
+          returnType = "double";
+          break;
       }
 
       final methodName = "validate$name";
@@ -81,6 +89,27 @@ class IsSerializerGenerator extends GeneratorForAnnotation<IsSerializer> {
     });
     sourceBuilder.write("};");
     sourceBuilder.write("}");
+
+    // write create instance method
+    sourceBuilder.writeln("@override");
+    sourceBuilder
+        .writeln("$proxyClass createInstance(Map<String, dynamic> data) {");
+
+    sourceBuilder.writeln("return $proxyClass(");
+    annotation.read('fields').listValue.forEach((element) {
+      String name = ConstantReader(element).read('name').stringValue;
+      final constantReaderSource = ConstantReader(element).read('source');
+
+      final source =
+          constantReaderSource.isNull ? name : constantReaderSource.stringValue;
+
+      sourceBuilder.writeln("$source: data['$name'],");
+    });
+    sourceBuilder.writeln("shouldSync: false,");
+    sourceBuilder.writeln(");");
+
+    // close create instance method
+    sourceBuilder.writeln("}");
 
     // write prefix
     sourceBuilder.writeln("@override");
