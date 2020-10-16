@@ -10,7 +10,9 @@ environment:
 dependencies:
   entity_sync:
     git:
-      url: https://github.com/anhphamduy/entity_sync
+      url: https://github.com/cmberryau/entity_sync
+#    path: ../entity_sync
+  analyzer: ^0.39.0
 
   source_gen: ^0.9.6
   build: ^1.3.0

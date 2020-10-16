@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/visitor.dart';
@@ -5,8 +6,7 @@ import 'package:build/build.dart';
 import 'package:entity_sync/entity_sync.dart';
 import 'package:source_gen/source_gen.dart';
 
-part 'is_serializer.dart';
-part 'use_serialization.dart';
+part 'use_entity_sync.dart';
 
 class ModelVisitor extends SimpleElementVisitor {
   DartType className;
