@@ -164,7 +164,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
   void generateSerializerClass() {
     final baseClassName = baseElement.displayName;
     final proxyClassName = '${baseClassName}Proxy';
-    final serializerClassName = '${baseClassName}Serializer';
+    final serializerClassName = 'Base${baseClassName}Serializer';
 
     // open class name
     sourceBuilder.writeln(
