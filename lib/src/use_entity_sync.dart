@@ -96,7 +96,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
 
     // properties of map
     namedArguments.forEach((element) {
-      sourceBuilder.write("'${element.name}': ${element.name}],");
+      sourceBuilder.write("'${element.name}': ${element.name},");
     });
 
     // close toMap method
