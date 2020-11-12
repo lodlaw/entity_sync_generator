@@ -95,9 +95,9 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     sourceBuilder.writeln("Map<String, dynamic> toMap() { return {");
 
     // properties of map
-    for (final propertyName in fields.keys) {
-      sourceBuilder.writeln("'$propertyName': $propertyName,");
-    }
+    namedArguments.forEach((element) {
+      sourceBuilder.write("'${element.name}': ${element.name}],");
+    });
 
     // close toMap method
     sourceBuilder.writeln("};}");
