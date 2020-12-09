@@ -45,6 +45,10 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
       flagField = annotation.read('flagField').objectValue;
     }
 
+    // ignoring dart compiler warnings
+    sourceBuilder.write(
+      '// ignore_for_file: non_constant_identifier_names'
+    );
     generateProxyClass();
     generateSerializerClass();
     generateFactoryClass();
