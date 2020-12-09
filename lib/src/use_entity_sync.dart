@@ -46,7 +46,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     }
 
     // ignoring dart compiler warnings
-    sourceBuilder.write(
+    sourceBuilder.writeln(
       '// ignore_for_file: non_constant_identifier_names'
     );
     generateProxyClass();
