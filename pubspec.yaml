@@ -12,10 +12,10 @@ dependencies:
     git:
       url: https://github.com/anhphamduy/entity_sync
 #    path: ../entity_sync
-  analyzer: ^1.1.0
+  analyzer: ">=0.40.0 <0.43.0"
 
-  source_gen: ^0.9.10+3
-  build: ^1.6.3
-
-dev_dependencies:
-  test: ^1.16.5
+  source_gen: ^0.9.4
+  build: ^1.6.0
+#
+#dev_dependencies:
+#  test: ^1.16.5
