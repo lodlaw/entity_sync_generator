@@ -9,9 +9,9 @@ import 'package:source_gen/source_gen.dart';
 part 'use_entity_sync.dart';
 
 class ModelVisitor extends SimpleElementVisitor {
-  DartType className;
+  late DartType className;
   Map<String, DartType> fields = Map();
-  List<ParameterElement> parameters;
+  List<ParameterElement>? parameters;
 
   @override
   visitConstructorElement(ConstructorElement element) {

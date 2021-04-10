@@ -8,15 +8,15 @@ Builder useEntitySyncBuilder(BuilderOptions options) {
 class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
   Iterable<ParameterElement> requiredPositionalArguments = [];
   Iterable<ParameterElement> namedArguments = [];
-  Element baseElement;
-  Element element;
-  Map<String, DartType> fields;
-  Iterable<DartObject> serializableFields;
-  DartObject keyField;
-  DartObject remoteKeyField;
-  DartObject flagField;
+  late Element baseElement;
+  late Element element;
+  late Map<String, DartType> fields;
+  late Iterable<DartObject> serializableFields;
+  late DartObject keyField;
+  late DartObject remoteKeyField;
+  late DartObject flagField;
 
-  StringBuffer sourceBuilder;
+  late StringBuffer sourceBuilder;
 
   @override
   generateForAnnotatedElement(
@@ -25,12 +25,12 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     final visitor = ModelVisitor();
     this.element = element;
 
-    baseElement = annotation.read('baseClass').typeValue.element;
+    baseElement = annotation.read('baseClass').typeValue.element!;
     baseElement.visitChildren(visitor);
 
     requiredPositionalArguments =
-        visitor.parameters.where((element) => element.isRequiredPositional);
-    namedArguments = visitor.parameters.where((element) => element.isNamed);
+        visitor.parameters!.where((element) => element.isRequiredPositional);
+    namedArguments = visitor.parameters!.where((element) => element.isNamed);
     fields = visitor.fields;
 
     serializableFields = annotation.read('fields').listValue;
@@ -46,9 +46,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     }
 
     // ignoring dart compiler warnings
-    sourceBuilder.writeln(
-      '// ignore_for_file: non_constant_identifier_names'
-    );
+    sourceBuilder.writeln('// ignore_for_file: non_constant_identifier_names');
     generateProxyClass();
     generateSerializerClass();
     generateFactoryClass();
@@ -124,27 +122,15 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
 
     // generate key fields
     sourceBuilder.write("final keyField = ");
-    if (keyField == null) {
-      sourceBuilder.writeln('null');
-    } else {
-      generateSerializableField(keyField);
-    }
+    generateSerializableField(keyField);
     sourceBuilder.writeln(';');
 
     sourceBuilder.write("final remoteKeyField = ");
-    if (remoteKeyField == null) {
-      sourceBuilder.writeln('null');
-    } else {
-      generateSerializableField(remoteKeyField);
-    }
+    generateSerializableField(remoteKeyField);
     sourceBuilder.writeln(';');
 
     sourceBuilder.write("final flagField = ");
-    if (flagField == null) {
-      sourceBuilder.writeln('null');
-    } else {
-      generateSerializableField(flagField);
-    }
+    generateSerializableField(flagField);
     sourceBuilder.writeln(';');
 
     // build from entity factory
@@ -195,8 +181,8 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
       String name = ConstantReader(element).read('name').stringValue;
       name = "${name[0].toUpperCase()}${name.substring(1)}";
 
-      String returnType;
-      switch (element.type.element.displayName) {
+      String? returnType;
+      switch (element.type!.element!.displayName) {
         case "StringField":
           returnType = "String";
           break;
@@ -220,9 +206,13 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
       final methodName = "validate$name";
       methods.add(methodName);
 
-      sourceBuilder.writeln("""$returnType $methodName($returnType value) {
+      if (returnType != null) {
+        sourceBuilder.writeln("""$returnType $methodName($returnType value) {
             return value;
           }""");
+      } else {
+        throw new Error();
+      }
     });
 
     // write toMap method
@@ -291,7 +281,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     String source =
         constantReaderSource.isNull ? name : constantReaderSource.stringValue;
 
-    final type = element.type.element.displayName;
+    final type = element.type!.element!.displayName;
 
     sourceBuilder.write(
       "$type('$name' ${prefix.isEmpty ? "" : ",prefix: '$prefix'"}, source: '$source')",
