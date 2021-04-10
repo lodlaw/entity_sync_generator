@@ -69,10 +69,12 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     }
 
     if (namedArguments.isNotEmpty) {
+      print(namedArguments);
       sourceBuilder.write("{");
 
       namedArguments.forEach((element) {
-        sourceBuilder.write("${element.type} ${element.name}, ");
+        final optional = element.isOptional ? "" : "required ";
+        sourceBuilder.write("${optional}${element.type} ${element.name}, ");
       });
 
       sourceBuilder.write("}");
@@ -121,17 +123,23 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     sourceBuilder.writeln("}");
 
     // generate key fields
+    sourceBuilder.writeln('@override');
     sourceBuilder.write("final keyField = ");
     generateSerializableField(keyField);
     sourceBuilder.writeln(';');
+    sourceBuilder.writeln('');
 
+    sourceBuilder.writeln('@override');
     sourceBuilder.write("final remoteKeyField = ");
     generateSerializableField(remoteKeyField);
     sourceBuilder.writeln(';');
+    sourceBuilder.writeln('');
 
+    sourceBuilder.writeln('@override');
     sourceBuilder.write("final flagField = ");
     generateSerializableField(flagField);
     sourceBuilder.writeln(';');
+    sourceBuilder.writeln('');
 
     // build from entity factory
     sourceBuilder
@@ -162,7 +170,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
 
     // write construtor
     sourceBuilder.writeln("""
-    $serializerClassName({Map<String, dynamic> data, $proxyClassName instance, String prefix = ''}): 
+    $serializerClassName({Map<String, dynamic>? data, $proxyClassName? instance, String prefix = ''}): 
                           super(data: data, instance: instance, prefix: prefix);
     """);
 
@@ -207,7 +215,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
       methods.add(methodName);
 
       if (returnType != null) {
-        sourceBuilder.writeln("""$returnType $methodName($returnType value) {
+        sourceBuilder.writeln("""$returnType? $methodName($returnType? value) {
             return value;
           }""");
       } else {
