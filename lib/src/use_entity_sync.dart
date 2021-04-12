@@ -69,12 +69,15 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     }
 
     if (namedArguments.isNotEmpty) {
-      print(namedArguments);
       sourceBuilder.write("{");
 
       namedArguments.forEach((element) {
         final optional = element.isOptional ? "" : "required ";
-        sourceBuilder.write("${optional}${element.type} ${element.name}, ");
+        sourceBuilder.write(
+          "${optional}${element.type.getDisplayString(
+            withNullability: false,
+          )} ${element.name}, ",
+        );
       });
 
       sourceBuilder.write("}");
