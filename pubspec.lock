@@ -83,8 +83,8 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "312d7a01c2564f033df77249251ff4b6208f9557"
-      url: "https://github.com/anhphamduy/entity_sync"
+      resolved-ref: d9cb3e0b57cabf1626e33e0da842732abce83800
+      url: "https://github.com/cmberryau/entity_sync"
     source: git
     version: "0.0.1"
   ffi:
@@ -114,14 +114,14 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.2"
+    version: "0.13.1"
   http_parser:
     dependency: transitive
     description:
       name: http_parser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.4"
+    version: "4.0.0"
   logging:
     dependency: transitive
     description:
