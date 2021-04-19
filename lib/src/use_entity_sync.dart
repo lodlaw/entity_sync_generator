@@ -19,16 +19,13 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
   late StringBuffer sourceBuilder;
 
   @override
-  generateForAnnotatedElement(Element element, ConstantReader annotation,
-      BuildStep buildStep) {
+  generateForAnnotatedElement(
+      Element element, ConstantReader annotation, BuildStep buildStep) {
     sourceBuilder = StringBuffer();
     final visitor = ModelVisitor();
     this.element = element;
 
-    baseElement = annotation
-        .read('baseClass')
-        .typeValue
-        .element!;
+    baseElement = annotation.read('baseClass').typeValue.element!;
     baseElement.visitChildren(visitor);
 
     requiredPositionalArguments =
@@ -36,30 +33,16 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     namedArguments = visitor.parameters!.where((element) => element.isNamed);
     fields = visitor.fields;
 
-    serializableFields = annotation
-        .read('fields')
-        .listValue;
+    serializableFields = annotation.read('fields').listValue;
 
-    if (!annotation
-        .read('keyField')
-        .isNull) {
-      keyField = annotation
-          .read('keyField')
-          .objectValue;
+    if (!annotation.read('keyField').isNull) {
+      keyField = annotation.read('keyField').objectValue;
     }
-    if (!annotation
-        .read('remoteKeyField')
-        .isNull) {
-      remoteKeyField = annotation
-          .read('remoteKeyField')
-          .objectValue;
+    if (!annotation.read('remoteKeyField').isNull) {
+      remoteKeyField = annotation.read('remoteKeyField').objectValue;
     }
-    if (!annotation
-        .read('flagField')
-        .isNull) {
-      flagField = annotation
-          .read('flagField')
-          .objectValue;
+    if (!annotation.read('flagField').isNull) {
+      flagField = annotation.read('flagField').objectValue;
     }
 
     // ignoring dart compiler warnings
@@ -91,237 +74,228 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
       namedArguments.forEach((element) {
         final optional = element.isOptional ? "" : "required ";
         sourceBuilder.write(
-            "${optional}${element.type.getDisplayString(
-              withNullability: false,
-            )${element.isOptional ? "?" : ""} ${element.name}, ",
-        );});
-
-        sourceBuilder.write("}");
-      }
-
-          sourceBuilder.write(") : super(");
-
-      for (final parameter in requiredPositionalArguments) {
-        sourceBuilder.write("${parameter.name},");
-      }
-
-      namedArguments.forEach((element) {
-        sourceBuilder.write("${element.name}: ${element.name},");
+          "${optional}${element.type.getDisplayString(
+            withNullability: false,
+          )}${element.isOptional ? "?" : ""} ${element.name}, ",
+        );
       });
 
-      sourceBuilder.writeln(");");
-
-      // override annotation for toMap()
-      sourceBuilder.writeln("@override");
-
-      // open toMap method
-      sourceBuilder.writeln("Map<String, dynamic> toMap() { return {");
-
-      // properties of map
-      namedArguments.forEach((element) {
-        sourceBuilder.write("'${element.name}': ${element.name},");
-      });
-
-      // close toMap method
-      sourceBuilder.writeln("};}");
-
-      // override annotation for copyFromMap()
-      sourceBuilder.writeln("@override");
-
-      // open copyFromMap method
-      sourceBuilder
-          .writeln("$proxyClassName copyFromMap(Map<String, dynamic> data) {");
-
-      sourceBuilder.writeln("return $proxyClassName(");
-
-      namedArguments.forEach((element) {
-        sourceBuilder.write("${element.name}: data['${element.name}'],");
-      });
-      sourceBuilder.writeln(");");
-      // close method
-      sourceBuilder.writeln("}");
-
-      // generate key fields
-      sourceBuilder.writeln('@override');
-      sourceBuilder.write("final keyField = ");
-      generateSerializableField(keyField);
-      sourceBuilder.writeln(';');
-      sourceBuilder.writeln('');
-
-      sourceBuilder.writeln('@override');
-      sourceBuilder.write("final remoteKeyField = ");
-      generateSerializableField(remoteKeyField);
-      sourceBuilder.writeln(';');
-      sourceBuilder.writeln('');
-
-      sourceBuilder.writeln('@override');
-      sourceBuilder.write("final flagField = ");
-      generateSerializableField(flagField);
-      sourceBuilder.writeln(';');
-      sourceBuilder.writeln('');
-
-      // build from entity factory
-      sourceBuilder
-          .writeln(
-          "$proxyClassName.fromEntity($baseClassName instance): super(");
-
-      for (final parameter in requiredPositionalArguments) {
-        sourceBuilder.write("instance.${parameter.name},");
-      }
-
-      namedArguments.forEach((element) {
-        sourceBuilder.write("${element.name}: instance.${element.name},");
-      });
-
-      sourceBuilder.writeln(");");
-
-      // close the whole class
-      sourceBuilder.writeln('}');
+      sourceBuilder.write("}");
     }
 
-    void generateSerializerClass() {
-      final baseClassName = baseElement.displayName;
-      final proxyClassName = '${baseClassName}Proxy';
-      final serializerClassName = 'Base${baseClassName}Serializer';
+    sourceBuilder.write(") : super(");
 
-      // open class name
-      sourceBuilder.writeln(
-          "class $serializerClassName extends Serializer<$proxyClassName> {");
+    for (final parameter in requiredPositionalArguments) {
+      sourceBuilder.write("${parameter.name},");
+    }
 
-      // write construtor
-      sourceBuilder.writeln("""
+    namedArguments.forEach((element) {
+      sourceBuilder.write("${element.name}: ${element.name},");
+    });
+
+    sourceBuilder.writeln(");");
+
+    // override annotation for toMap()
+    sourceBuilder.writeln("@override");
+
+    // open toMap method
+    sourceBuilder.writeln("Map<String, dynamic> toMap() { return {");
+
+    // properties of map
+    namedArguments.forEach((element) {
+      sourceBuilder.write("'${element.name}': ${element.name},");
+    });
+
+    // close toMap method
+    sourceBuilder.writeln("};}");
+
+    // override annotation for copyFromMap()
+    sourceBuilder.writeln("@override");
+
+    // open copyFromMap method
+    sourceBuilder
+        .writeln("$proxyClassName copyFromMap(Map<String, dynamic> data) {");
+
+    sourceBuilder.writeln("return $proxyClassName(");
+
+    namedArguments.forEach((element) {
+      sourceBuilder.write("${element.name}: data['${element.name}'],");
+    });
+    sourceBuilder.writeln(");");
+    // close method
+    sourceBuilder.writeln("}");
+
+    // generate key fields
+    sourceBuilder.writeln('@override');
+    sourceBuilder.write("final keyField = ");
+    generateSerializableField(keyField);
+    sourceBuilder.writeln(';');
+    sourceBuilder.writeln('');
+
+    sourceBuilder.writeln('@override');
+    sourceBuilder.write("final remoteKeyField = ");
+    generateSerializableField(remoteKeyField);
+    sourceBuilder.writeln(';');
+    sourceBuilder.writeln('');
+
+    sourceBuilder.writeln('@override');
+    sourceBuilder.write("final flagField = ");
+    generateSerializableField(flagField);
+    sourceBuilder.writeln(';');
+    sourceBuilder.writeln('');
+
+    // build from entity factory
+    sourceBuilder
+        .writeln("$proxyClassName.fromEntity($baseClassName instance): super(");
+
+    for (final parameter in requiredPositionalArguments) {
+      sourceBuilder.write("instance.${parameter.name},");
+    }
+
+    namedArguments.forEach((element) {
+      sourceBuilder.write("${element.name}: instance.${element.name},");
+    });
+
+    sourceBuilder.writeln(");");
+
+    // close the whole class
+    sourceBuilder.writeln('}');
+  }
+
+  void generateSerializerClass() {
+    final baseClassName = baseElement.displayName;
+    final proxyClassName = '${baseClassName}Proxy';
+    final serializerClassName = 'Base${baseClassName}Serializer';
+
+    // open class name
+    sourceBuilder.writeln(
+        "class $serializerClassName extends Serializer<$proxyClassName> {");
+
+    // write construtor
+    sourceBuilder.writeln("""
     $serializerClassName({Map<String, dynamic>? data, $proxyClassName? instance, String prefix = ''}): 
                           super(data: data, instance: instance, prefix: prefix);
     """);
 
-      // write fields
-      sourceBuilder.writeln("@override");
-      sourceBuilder.write("final fields = [");
-      serializableFields.forEach((element) {
-        generateSerializableField(element);
-        sourceBuilder.write(',');
-      });
-      sourceBuilder.writeln("];");
+    // write fields
+    sourceBuilder.writeln("@override");
+    sourceBuilder.write("final fields = [");
+    serializableFields.forEach((element) {
+      generateSerializableField(element);
+      sourceBuilder.write(',');
+    });
+    sourceBuilder.writeln("];");
 
-      final methods = <String>[];
-      // write validation methods
-      serializableFields.forEach((element) {
-        String name = ConstantReader(element)
-            .read('name')
-            .stringValue;
-        name = "${name[0].toUpperCase()}${name.substring(1)}";
+    final methods = <String>[];
+    // write validation methods
+    serializableFields.forEach((element) {
+      String name = ConstantReader(element).read('name').stringValue;
+      name = "${name[0].toUpperCase()}${name.substring(1)}";
 
-        String? returnType;
-        switch (element.type!.element!.displayName) {
-          case "StringField":
-            returnType = "String";
-            break;
-          case "IntegerField":
-            returnType = "int";
-            break;
-          case "DateTimeField":
-            returnType = "DateTime";
-            break;
-          case "BoolField":
-            returnType = "bool";
-            break;
-          case "DateField":
-            returnType = "DateTime";
-            break;
-          case "DoubleField":
-            returnType = "double";
-            break;
-        }
+      String? returnType;
+      switch (element.type!.element!.displayName) {
+        case "StringField":
+          returnType = "String";
+          break;
+        case "IntegerField":
+          returnType = "int";
+          break;
+        case "DateTimeField":
+          returnType = "DateTime";
+          break;
+        case "BoolField":
+          returnType = "bool";
+          break;
+        case "DateField":
+          returnType = "DateTime";
+          break;
+        case "DoubleField":
+          returnType = "double";
+          break;
+      }
 
-        final methodName = "validate$name";
-        methods.add(methodName);
+      final methodName = "validate$name";
+      methods.add(methodName);
 
-        if (returnType != null) {
-          sourceBuilder.writeln("""$returnType? $methodName($returnType? value) {
+      if (returnType != null) {
+        sourceBuilder.writeln("""$returnType? $methodName($returnType? value) {
             return value;
           }""");
-        } else {
-          throw new Error();
-        }
-      });
+      } else {
+        throw new Error();
+      }
+    });
 
-      // write toMap method
-      sourceBuilder.writeln("@override");
-      sourceBuilder.write("Map toMap() {");
-      sourceBuilder.write("return {");
-      methods.forEach((element) {
-        sourceBuilder.write("'$element': $element,");
-      });
-      sourceBuilder.write("};");
-      sourceBuilder.write("}");
+    // write toMap method
+    sourceBuilder.writeln("@override");
+    sourceBuilder.write("Map toMap() {");
+    sourceBuilder.write("return {");
+    methods.forEach((element) {
+      sourceBuilder.write("'$element': $element,");
+    });
+    sourceBuilder.write("};");
+    sourceBuilder.write("}");
 
-      // write create instance method
-      sourceBuilder.writeln("@override");
-      sourceBuilder
-          .writeln(
-          "$proxyClassName createInstance(Map<String, dynamic> data) {");
+    // write create instance method
+    sourceBuilder.writeln("@override");
+    sourceBuilder
+        .writeln("$proxyClassName createInstance(Map<String, dynamic> data) {");
 
-      sourceBuilder.writeln("return $proxyClassName(");
+    sourceBuilder.writeln("return $proxyClassName(");
 
-      serializableFields.forEach((element) {
-        String name = ConstantReader(element)
-            .read('name')
-            .stringValue;
-        final constantReaderSource = ConstantReader(element).read('source');
+    serializableFields.forEach((element) {
+      String name = ConstantReader(element).read('name').stringValue;
+      final constantReaderSource = ConstantReader(element).read('source');
 
-        final source =
+      final source =
+          constantReaderSource.isNull ? name : constantReaderSource.stringValue;
+
+      sourceBuilder.writeln("$source: data['$name'],");
+    });
+    sourceBuilder.writeln("shouldSync: false,");
+    sourceBuilder.writeln(");");
+
+    // close create instance method
+    sourceBuilder.writeln("}");
+
+    // close class name
+    sourceBuilder.writeln('}');
+  }
+
+  void generateFactoryClass() {
+    final baseClassName = baseElement.displayName;
+    final proxyClassName = '${baseClassName}Proxy';
+    final factoryClassName = '${proxyClassName}Factory';
+
+    sourceBuilder.writeln(
+        'class $factoryClassName extends ProxyFactory<$proxyClassName, $baseClassName> {');
+    sourceBuilder.writeln('@override');
+    sourceBuilder
+        .writeln('$proxyClassName fromInstance($baseClassName instance) {');
+    sourceBuilder.writeln('return $proxyClassName.fromEntity(instance);');
+    sourceBuilder.writeln('}');
+    sourceBuilder.writeln('}');
+  }
+
+  void generateEntitySyncClass() {
+    sourceBuilder.writeln('class \$_${element.displayName} {}');
+  }
+
+  void generateSerializableField(DartObject element) {
+    final name = ConstantReader(element).read('name').stringValue;
+
+    final constantReaderPrefix = ConstantReader(element).read('prefix');
+    String prefix =
+        constantReaderPrefix.isNull ? "" : constantReaderPrefix.stringValue;
+
+    final constantReaderSource = ConstantReader(element).read('source');
+    String source =
         constantReaderSource.isNull ? name : constantReaderSource.stringValue;
 
-        sourceBuilder.writeln("$source: data['$name'],");
-      });
-      sourceBuilder.writeln("shouldSync: false,");
-      sourceBuilder.writeln(");");
+    final type = element.type!.element!.displayName;
 
-      // close create instance method
-      sourceBuilder.writeln("}");
-
-      // close class name
-      sourceBuilder.writeln('}');
-    }
-
-    void generateFactoryClass() {
-      final baseClassName = baseElement.displayName;
-      final proxyClassName = '${baseClassName}Proxy';
-      final factoryClassName = '${proxyClassName}Factory';
-
-      sourceBuilder.writeln(
-          'class $factoryClassName extends ProxyFactory<$proxyClassName, $baseClassName> {');
-      sourceBuilder.writeln('@override');
-      sourceBuilder
-          .writeln('$proxyClassName fromInstance($baseClassName instance) {');
-      sourceBuilder.writeln('return $proxyClassName.fromEntity(instance);');
-      sourceBuilder.writeln('}');
-      sourceBuilder.writeln('}');
-    }
-
-    void generateEntitySyncClass() {
-      sourceBuilder.writeln('class \$_${element.displayName} {}');
-    }
-
-    void generateSerializableField(DartObject element) {
-      final name = ConstantReader(element)
-          .read('name')
-          .stringValue;
-
-      final constantReaderPrefix = ConstantReader(element).read('prefix');
-      String prefix =
-      constantReaderPrefix.isNull ? "" : constantReaderPrefix.stringValue;
-
-      final constantReaderSource = ConstantReader(element).read('source');
-      String source =
-      constantReaderSource.isNull ? name : constantReaderSource.stringValue;
-
-      final type = element.type!.element!.displayName;
-
-      sourceBuilder.write(
-        "$type('$name' ${prefix.isEmpty
-            ? ""
-            : ",prefix: '$prefix'"}, source: '$source')",
-      );
-    }
+    sourceBuilder.write(
+      "$type('$name' ${prefix.isEmpty ? "" : ",prefix: '$prefix'"}, source: '$source')",
+    );
   }
+}
