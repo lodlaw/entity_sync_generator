@@ -10,160 +10,153 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
   Iterable<ParameterElement> namedArguments = [];
   late Element baseElement;
   late Element element;
+  late Element dataclassElement;
   late Map<String, DartType> fields;
   late Iterable<DartObject> serializableFields;
-  late DartObject keyField;
-  late DartObject remoteKeyField;
-  late DartObject flagField;
+  late DartObject? keyField;
+  late DartObject? remoteKeyField;
+  late DartObject? flagField;
+
+  ModelVisitor baseElementVisitor = ModelVisitor();
+  ModelVisitor dataclassElementVisitor = ModelVisitor();
 
   late StringBuffer sourceBuilder;
 
   @override
   generateForAnnotatedElement(
-      Element element, ConstantReader annotation, BuildStep buildStep) {
-    sourceBuilder = StringBuffer();
-    final visitor = ModelVisitor();
+    Element element,
+    ConstantReader annotation,
+    BuildStep buildStep,
+  ) {
     this.element = element;
+    sourceBuilder = StringBuffer();
 
+    // read in and interpret the base class element
+    baseElementVisitor = ModelVisitor();
     baseElement = annotation.read('baseClass').typeValue.element!;
-    baseElement.visitChildren(visitor);
+    baseElement.visitChildren(baseElementVisitor);
 
-    requiredPositionalArguments =
-        visitor.parameters!.where((element) => element.isRequiredPositional);
-    namedArguments = visitor.parameters!.where((element) => element.isNamed);
-    fields = visitor.fields;
+    // read in and interpret the data class element
+    dataclassElementVisitor = ModelVisitor();
+    dataclassElement = annotation.read('dataClass').typeValue.element!;
+    dataclassElement.visitChildren(dataclassElementVisitor);
 
+    // read in a list of serializable fields
     serializableFields = annotation.read('fields').listValue;
 
+    // read in key field if not null
     if (!annotation.read('keyField').isNull) {
       keyField = annotation.read('keyField').objectValue;
     }
+
+    // read in the remote key field if not null
     if (!annotation.read('remoteKeyField').isNull) {
       remoteKeyField = annotation.read('remoteKeyField').objectValue;
     }
+
+    // read in the flag field if not null
     if (!annotation.read('flagField').isNull) {
       flagField = annotation.read('flagField').objectValue;
     }
 
     // ignoring dart compiler warnings
     sourceBuilder.writeln('// ignore_for_file: non_constant_identifier_names');
+
     generateProxyClass();
     generateSerializerClass();
     generateFactoryClass();
     generateEntitySyncClass();
 
+    print(sourceBuilder.toString());
     return sourceBuilder.toString();
   }
 
   void generateProxyClass() {
-    // open class name
     final baseClassName = baseElement.displayName;
-    final proxyClassName = '${baseClassName}Proxy';
+    final companionClassName = baseClassName + 'Companion';
+    final dataclassName = dataclassElement.displayName;
+
+    // get the class name for the proxy
+    final proxyClassName = '${dataclassName}Proxy';
+
+    // write out the class itself
     sourceBuilder.writeln(
-        'class $proxyClassName extends $baseClassName with ProxyMixin<$baseClassName>, SyncableMixin, SerializableMixin{');
+      'class $proxyClassName extends $companionClassName with ProxyMixin<$dataclassName>, SyncableMixin, SerializableMixin{',
+    );
 
-    sourceBuilder.write("$proxyClassName(");
-
-    for (final parameter in requiredPositionalArguments) {
-      sourceBuilder.write("$parameter,");
-    }
-
-    if (namedArguments.isNotEmpty) {
-      sourceBuilder.write("{");
-
-      namedArguments.forEach((element) {
-        final optional = element.isOptional ? "" : "required ";
-        sourceBuilder.write(
-          "${optional}${element.type.getDisplayString(
-            withNullability: false,
-          )}${element.isOptional ? "?" : ""} ${element.name}, ",
-        );
-      });
-
-      sourceBuilder.write("}");
-    }
-
-    sourceBuilder.write(") : super(");
-
-    for (final parameter in requiredPositionalArguments) {
-      sourceBuilder.write("${parameter.name},");
-    }
-
-    namedArguments.forEach((element) {
-      sourceBuilder.write("${element.name}: ${element.name},");
+    // write out the default constructor
+    sourceBuilder.writeln('$proxyClassName({');
+    dataclassElementVisitor.parameters!.forEach((element) {
+      sourceBuilder.writeln(
+        'Value<${element.type}> ${element.name} = const Value.absent(),',
+      );
     });
-
-    sourceBuilder.writeln(");");
-
-    // override annotation for toMap()
-    sourceBuilder.writeln("@override");
-
-    // open toMap method
-    sourceBuilder.writeln("Map<String, dynamic> toMap() { return {");
-
-    // properties of map
-    namedArguments.forEach((element) {
-      sourceBuilder.write("'${element.name}': ${element.name},");
+    sourceBuilder.writeln('}) : super(');
+    dataclassElementVisitor.parameters!.forEach((element) {
+      sourceBuilder.writeln(
+        '${element.name}: ${element.name},',
+      );
     });
+    sourceBuilder.writeln(');');
 
-    // close toMap method
-    sourceBuilder.writeln("};}");
+    // write out toMap method
+    sourceBuilder.writeln('@override');
+    sourceBuilder.writeln('Map<String, dynamic> toMap() {');
+    sourceBuilder.writeln('return {');
+    dataclassElementVisitor.parameters!.forEach((element) {
+      sourceBuilder.writeln("'${element.name}': ${element.name}.value,");
+    });
+    sourceBuilder.writeln('};');
+    sourceBuilder.writeln('}');
 
-    // override annotation for copyFromMap()
-    sourceBuilder.writeln("@override");
-
-    // open copyFromMap method
+    // generate copyFromMap method
+    sourceBuilder.writeln('@override');
     sourceBuilder
-        .writeln("$proxyClassName copyFromMap(Map<String, dynamic> data) {");
-
-    sourceBuilder.writeln("return $proxyClassName(");
-
-    namedArguments.forEach((element) {
-      sourceBuilder.write("${element.name}: data['${element.name}'],");
+        .writeln('${proxyClassName} copyFromMap(Map<String, dynamic> data) {');
+    sourceBuilder.writeln('return ${proxyClassName}(');
+    dataclassElementVisitor.parameters!.forEach((element) {
+      sourceBuilder.writeln(
+        "${element.name}: Value<${element.type}>(data['${element.name}']),",
+      );
     });
-    sourceBuilder.writeln(");");
-    // close method
-    sourceBuilder.writeln("}");
+    sourceBuilder.writeln(');}');
 
     // generate key fields
     sourceBuilder.writeln('@override');
     sourceBuilder.write("final keyField = ");
-    generateSerializableField(keyField);
+    generateSerializableField(keyField!);
     sourceBuilder.writeln(';');
-    sourceBuilder.writeln('');
 
+    // generate remote key fields
     sourceBuilder.writeln('@override');
     sourceBuilder.write("final remoteKeyField = ");
-    generateSerializableField(remoteKeyField);
+    generateSerializableField(remoteKeyField!);
     sourceBuilder.writeln(';');
-    sourceBuilder.writeln('');
 
+    // generate flag field
     sourceBuilder.writeln('@override');
     sourceBuilder.write("final flagField = ");
-    generateSerializableField(flagField);
+    generateSerializableField(flagField!);
     sourceBuilder.writeln(';');
-    sourceBuilder.writeln('');
 
-    // build from entity factory
-    sourceBuilder
-        .writeln("$proxyClassName.fromEntity($baseClassName instance): super(");
-
-    for (final parameter in requiredPositionalArguments) {
-      sourceBuilder.write("instance.${parameter.name},");
-    }
-
-    namedArguments.forEach((element) {
-      sourceBuilder.write("${element.name}: instance.${element.name},");
+    // generate fromEntity factory
+    sourceBuilder.writeln(
+        'factory ${proxyClassName}.fromEntity(${dataclassName} instance) {');
+    sourceBuilder.writeln('return ${proxyClassName}(');
+    dataclassElementVisitor.parameters!.forEach((element) {
+      sourceBuilder.writeln(
+        '${element.name}: Value<${element.type}>(instance.${element.name}),',
+      );
     });
+    sourceBuilder.writeln(');');
+    sourceBuilder.writeln('}');
 
-    sourceBuilder.writeln(");");
-
-    // close the whole class
+    // write out the closing brace for the class
     sourceBuilder.writeln('}');
   }
 
   void generateSerializerClass() {
-    final baseClassName = baseElement.displayName;
+    final baseClassName = dataclassElement.displayName;
     final proxyClassName = '${baseClassName}Proxy';
     final serializerClassName = 'Base${baseClassName}Serializer';
 
@@ -236,13 +229,11 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     sourceBuilder.write("};");
     sourceBuilder.write("}");
 
-    // write create instance method
+    // write createInstance method
     sourceBuilder.writeln("@override");
     sourceBuilder
         .writeln("$proxyClassName createInstance(Map<String, dynamic> data) {");
-
     sourceBuilder.writeln("return $proxyClassName(");
-
     serializableFields.forEach((element) {
       String name = ConstantReader(element).read('name').stringValue;
       final constantReaderSource = ConstantReader(element).read('source');
@@ -250,20 +241,21 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
       final source =
           constantReaderSource.isNull ? name : constantReaderSource.stringValue;
 
-      sourceBuilder.writeln("$source: data['$name'],");
-    });
-    sourceBuilder.writeln("shouldSync: false,");
-    sourceBuilder.writeln(");");
+      final sourceType =
+          dataclassElementVisitor.parameters!.firstWhere((element) {
+        return element.name.toString() == source;
+      }).type;
 
-    // close create instance method
-    sourceBuilder.writeln("}");
+      sourceBuilder.writeln("$source: Value<$sourceType>(data['$name']),");
+    });
+    sourceBuilder.writeln("shouldSync: Value<bool>(false),);}");
 
     // close class name
     sourceBuilder.writeln('}');
   }
 
   void generateFactoryClass() {
-    final baseClassName = baseElement.displayName;
+    final baseClassName = dataclassElement.displayName;
     final proxyClassName = '${baseClassName}Proxy';
     final factoryClassName = '${proxyClassName}Factory';
 
