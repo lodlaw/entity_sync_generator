@@ -82,8 +82,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: d9cb3e0b57cabf1626e33e0da842732abce83800
+      ref: companion
+      resolved-ref: aa3ac7f82a4412c121e293e410521fd5d91ca1f0
       url: "https://github.com/cmberryau/entity_sync"
     source: git
     version: "0.0.1"
@@ -114,7 +114,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.1"
+    version: "0.13.3"
   http_parser:
     dependency: transitive
     description:
