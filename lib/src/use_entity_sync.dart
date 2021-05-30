@@ -104,7 +104,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     sourceBuilder.writeln('Map<String, dynamic> toMap() {');
     sourceBuilder.writeln('return {');
     dataclassElementVisitor.parameters!.forEach((element) {
-      sourceBuilder.writeln("'${element.name}': ${element.name}.value,");
+      sourceBuilder.writeln("'${element.name}': ${element.name}.present ? ${element.name}.value : null,");
     });
     sourceBuilder.writeln('};');
     sourceBuilder.writeln('}');
