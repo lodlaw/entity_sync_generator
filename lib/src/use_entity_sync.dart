@@ -67,7 +67,6 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     generateFactoryClass();
     generateEntitySyncClass();
 
-    print(sourceBuilder.toString());
     return sourceBuilder.toString();
   }
 
