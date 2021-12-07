@@ -13,10 +13,10 @@ dependencies:
       url: https://github.com/cmberryau/entity_sync
 #    path: ../entity_sync
       ref: "companion"
-  analyzer: "^2.1.0"
+  analyzer: ^2.1.0
 
-  source_gen: ^0.9.4
-  build: ^2.0.0
+  source_gen: ^1.2.0
+  build: ^2.1.1
 #
 #dev_dependencies:
 #  test: ^1.16.5
