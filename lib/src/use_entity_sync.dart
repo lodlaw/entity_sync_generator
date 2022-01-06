@@ -247,7 +247,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
 
       sourceBuilder.writeln("$source: Value<$sourceType>(data['$name'] as $sourceType),");
     });
-    sourceBuilder.writeln("shouldSync: Value<bool>(false),);}");
+    sourceBuilder.writeln("shouldSync: const Value<bool>(false),);}");
 
     // close class name
     sourceBuilder.writeln('}');
