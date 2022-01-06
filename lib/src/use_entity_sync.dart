@@ -115,7 +115,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     sourceBuilder.writeln('return ${proxyClassName}(');
     dataclassElementVisitor.parameters!.forEach((element) {
       sourceBuilder.writeln(
-        "${element.name}: Value<${element.type}>(data['${element.name}']),",
+        "${element.name}: Value<${element.type}>(data['${element.name}'] as ${element.type}),",
       );
     });
     sourceBuilder.writeln(');}');
@@ -286,7 +286,7 @@ class UseEntitySyncGenerator extends GeneratorForAnnotation<UseEntitySync> {
     final type = element.type!.element!.displayName;
 
     sourceBuilder.write(
-      "$type('$name' ${prefix.isEmpty ? "" : ",prefix: '$prefix'"}, source: '$source')",
+      "const $type('$name' ${prefix.isEmpty ? "" : ",prefix: '$prefix'"}, source: '$source')",
     );
   }
 }
