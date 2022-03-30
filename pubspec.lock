@@ -78,12 +78,19 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0"
+  drift:
+    dependency: transitive
+    description:
+      name: drift
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.5.0"
   entity_sync:
     dependency: "direct main"
     description:
       path: "."
-      ref: companion
-      resolved-ref: aa3ac7f82a4412c121e293e410521fd5d91ca1f0
+      ref: master-2
+      resolved-ref: "9b79e1ac7499ec4edb37f2dddd1a05e0d6cb6707"
       url: "https://github.com/cmberryau/entity_sync"
     source: git
     version: "0.0.1"
@@ -136,13 +143,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.0"
-  moor:
-    dependency: transitive
-    description:
-      name: moor
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.0"
   package_config:
     dependency: transitive
     description:
@@ -191,7 +191,7 @@ packages:
       name: sqlite3
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.5.1"
   stream_channel:
     dependency: transitive
     description:
@@ -235,4 +235,4 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.15.0 <3.0.0"
