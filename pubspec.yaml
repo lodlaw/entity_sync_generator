@@ -12,7 +12,7 @@ dependencies:
     git:
       url: https://github.com/cmberryau/entity_sync
 #    path: ../entity_sync
-      ref: "master-2"
+      ref: "dev"
   analyzer: ^2.1.0
 
   source_gen: ^1.2.0
